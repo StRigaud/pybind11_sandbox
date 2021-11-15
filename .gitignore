@@ -1,7 +1,21 @@
+# Folders
+.vscode
+build
+
+# Specific files/folders
+cle_preamble.h
+clic.h
+cleKernelList.h
+clic/kernels
+
+
+# System files
+.DS_Store
+
 # Prerequisites
 *.d
 
-# Compiled Object files
+# Compiled Object Files
 *.slo
 *.lo
 *.o
@@ -11,16 +25,12 @@
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
+# Compiled Dynamic Libraries
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
+#Compiled Static libraries
 *.lai
 *.la
 *.a
@@ -30,3 +40,5 @@
 *.exe
 *.out
 *.app
+*.iml
+/.idea/

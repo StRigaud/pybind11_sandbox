@@ -1,0 +1,6 @@
+[submodule "thirdparty/clij-opencl-kernels"]
+	path = thirdparty/clij-opencl-kernels
+	url = https://github.com/clEsperanto/clij-opencl-kernels.git
+[submodule "thirdparty/OpenCL-CLHPP"]
+	path = thirdparty/OpenCL-CLHPP
+	url = https://github.com/KhronosGroup/OpenCL-CLHPP.git
