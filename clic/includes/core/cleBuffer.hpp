@@ -24,7 +24,7 @@ public:
 
     const cl::Buffer* Data() const;
 
-    const std::string Info() const;
+    std::string Info();
 
 private:
     std::shared_ptr<const cl::Buffer> m_Ocl =nullptr;

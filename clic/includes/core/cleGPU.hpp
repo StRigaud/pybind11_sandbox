@@ -82,9 +82,9 @@ public:
     template<class T = float>
     cle::Image PushImage(std::vector<T>&, const std::array<size_t,3>& ={1,1,1}) const;
     template<class T = float>
-    std::vector<T> Pull(const cle::Buffer&) const;
+    std::vector<T> PullBuffer(const cle::Buffer&) const;
     template<class T = float>
-    std::vector<T> Pull(const cle::Image&) const;
+    std::vector<T> PullImage(const cle::Image&) const;
 };
 
 template<class T>
@@ -117,7 +117,7 @@ cle::Buffer GPU::PushBuffer(std::vector<T>& t_arr, const std::array<size_t,3>& t
 }
 
 template<class T>
-std::vector<T> GPU::Pull(const cle::Buffer& t_buffer) const
+std::vector<T> GPU::PullBuffer(const cle::Buffer& t_buffer) const
 {
     std::vector<T> arr (t_buffer.Size());
     this->ReadBuffer(t_buffer.Data(), arr.data());
@@ -140,7 +140,7 @@ cle::Image GPU::PushImage(std::vector<T>& t_arr, const std::array<size_t,3>& t_s
 }
 
 template<class T>
-std::vector<T> GPU::Pull(const cle::Image& t_image) const
+std::vector<T> GPU::PullImage(const cle::Image& t_image) const
 {
     std::vector<T> arr (t_image.Size());
     this->ReadImage(t_image.Data(), arr.data());

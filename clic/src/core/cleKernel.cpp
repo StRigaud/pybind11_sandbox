@@ -11,7 +11,6 @@ void Kernel::ManageDimensions(const char* t_tag)
         auto it = this->m_Parameters.find(t_tag);
         if (it != this->m_Parameters.end())
         {
-            DEBUG("parameter dim = " << this->m_Parameters.at(t_tag)->nDim() << "\n");
             if(this->m_Parameters.at(t_tag)->nDim() == 3)
             {
                 this->m_nDimPrefix = "_3d";
@@ -188,6 +187,7 @@ void Kernel::SetArguments()
             if (this->m_Parameters.at(tag)->IsObjectType("buffer"))
             {    
                 auto object = std::dynamic_pointer_cast<cle::Buffer>(this->m_Parameters.at(tag));
+        
                 try
                 {
                     this->m_Kernel.setArg(index, *object->Data());
@@ -206,6 +206,7 @@ void Kernel::SetArguments()
             else if (this->m_Parameters.at(tag)->IsObjectType("image"))
             {    
                 auto object = std::dynamic_pointer_cast<cle::Image>(this->m_Parameters.at(tag));
+        
                 try
                 {
                     this->m_Kernel.setArg(index, *object->Data());
@@ -225,6 +226,7 @@ void Kernel::SetArguments()
             {    
                 if (this->m_Parameters.at(tag)->IsDataType("float")) {
                     auto object = std::dynamic_pointer_cast< cle::Scalar<float> >(this->m_Parameters.at(tag));
+            
                     this->m_Kernel.setArg(index, object->Data()); 
                 }
                 else if (this->m_Parameters.at(tag)->IsDataType("int")) {
@@ -271,11 +273,13 @@ void Kernel::AddObject(Object& t_ocl_object, const char* t_tag)
             {
                 auto cast_object = dynamic_cast<cle::Image&>(t_ocl_object);
                 it->second = std::make_shared<cle::Image>(cast_object);
+        
             }
             else
             {
                 auto cast_object = dynamic_cast<cle::Buffer&>(t_ocl_object);
                 it->second = std::make_shared<cle::Buffer>(cast_object);
+        
             }
         }
         else    
@@ -284,11 +288,13 @@ void Kernel::AddObject(Object& t_ocl_object, const char* t_tag)
             {
                 auto cast_object = dynamic_cast<cle::Image&>(t_ocl_object);
                 this->m_Parameters.insert(std::make_pair(t_tag, std::make_shared<cle::Image>(cast_object)));
+        
             }
             else
             {
                 auto cast_object = dynamic_cast<cle::Buffer&>(t_ocl_object);
                 this->m_Parameters.insert(std::make_pair(t_tag, std::make_shared<cle::Buffer>(cast_object)));
+        
             }
         }
     }
@@ -394,7 +400,7 @@ void Kernel::BuildProgramKernel()
 
 void Kernel::EnqueueKernel()
 {
-    cl::NDRange globalND(this->m_GlobalRange[0], this->m_GlobalRange[1], this->m_GlobalRange[2]);  
+    cl::NDRange globalND(this->m_GlobalRange[0], this->m_GlobalRange[1], this->m_GlobalRange[2]); 
     try
     {
         this->m_gpu->CommandQueue().enqueueNDRangeKernel(this->m_Kernel, cl::NullRange, globalND, cl::NullRange);

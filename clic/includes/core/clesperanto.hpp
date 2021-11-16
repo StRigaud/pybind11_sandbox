@@ -68,13 +68,13 @@ public:
     template<class T>
     std::vector<T> Clesperanto::Pull(cle::Buffer& t_data) const
     {
-        return this->m_gpu->Pull<T>(t_data);
+        return this->m_gpu->PullBuffer<T>(t_data);
     }
 
     template<class T>
     std::vector<T> Clesperanto::PullImage(cle::Image& t_data) const
     {
-        return this->m_gpu->Pull<T>(t_data);
+        return this->m_gpu->PullImage<T>(t_data);
     }
 
 
