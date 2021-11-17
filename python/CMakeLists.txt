@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(pyclesperanto VERSION 0.4.0)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/includes)
+
 Python_add_library(data MODULE src/data.cpp)
 target_link_libraries(data PRIVATE pybind11::headers OpenCL::OpenCL CLIc::CLIc)
 set_target_properties(data PROPERTIES

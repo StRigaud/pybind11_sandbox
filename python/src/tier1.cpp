@@ -11,7 +11,7 @@
 
 using namespace cle;
 
-#include "gpu.cpp"  // todo: find a cleaner way to call the class PyGPU
+#include "gpu.hpp"  // todo: find a cleaner way to call the class PyGPU
 
 void AddImageAndScalar(Buffer& input, Buffer& output, float scalar, PyGPU& gpu)
 {

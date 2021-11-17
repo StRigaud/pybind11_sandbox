@@ -1,128 +1,124 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
+#include "gpu.hpp"
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 
-#include "cleGPU.hpp"
-#include "cleBuffer.hpp"
-#include "cleImage.hpp"
 
 using namespace cle;
 
 
-// todo: trampoline class for interface C++ python
-// Should we do that for all wrapped class? (aka overlayer of wrapper)
 
-class PyGPU : public GPU {
-public:
-    /* Inherit the constructors */
-    using GPU::GPU;
-    /* numpy compatibility */
-    Buffer CreateBuffer(pybind11::array_t<float, pybind11::array::c_style | pybind11::array::forcecast>& dimensions) 
-        { 
-            pybind11::buffer_info arr = dimensions.request();
-            if (arr.ndim > 1)
-            {
-                throw std::runtime_error("Expecting 1d shape array");
-            }
-            if (arr.size > 3)
-            {
-                throw std::runtime_error("Number of dimensions must be three or less");
-            }
-            float* ptr = static_cast<float*>(arr.ptr);
-            std::array<size_t,3> shape = {1, 1, 1};
-            for (auto i = 0;  i < arr.size; ++i)
-            {
-                if(ptr[i] > 0)
-                    shape[i] = static_cast<size_t>(ptr[i]);
-            }
-            return GPU::CreateBuffer<float>(shape); 
-        };
-
-    Buffer PushBuffer(pybind11::array_t<float, pybind11::array::c_style | pybind11::array::forcecast>& ndarray) 
-        { 
-            pybind11::buffer_info arr = ndarray.request();
-            if (arr.ndim > 3)
-            {
-                throw std::runtime_error("Number of dimensions must be three or less");
-            }
-            std::array<size_t,3> shape = {1, 1, 1};
-            for (auto i = 0;  i < arr.ndim; ++i)
-            {
-                if(arr.shape[i] > 0)
-                    shape[i] = static_cast<size_t>(arr.shape[i]);
-            }
-            float* arr_ptr = static_cast<float*>(arr.ptr);
-            std::vector<float> values(arr_ptr, arr_ptr + arr.size);
-            return GPU::PushBuffer<float>(values, shape); 
-        };
-
-    pybind11::array_t<float> PullBuffer(Buffer& buffer) 
-        { 
-            auto output = GPU::PullBuffer<float>(buffer);
-            auto result = pybind11::array_t<float>(output.size());
-            float* ptr = static_cast<float*>(result.request().ptr);
-            for (auto i = 0;  i < output.size(); ++i)
-            {
-                ptr[i] = output[i];
-            }
-            result.resize({buffer.Shape()[0], buffer.Shape()[1], buffer.Shape()[2]});
-            return result.squeeze();
-        }    
-
-
-    Image CreateImage(pybind11::array_t<float, pybind11::array::c_style | pybind11::array::forcecast>& dimensions) 
-        { 
-            pybind11::buffer_info arr = dimensions.request();
-            if (arr.ndim > 1)
-            {
-                throw std::runtime_error("Expecting 1d shape array");
-            }
-            if (arr.size > 3)
-            {
-                throw std::runtime_error("Number of dimensions must be three or less");
-            }
-            float* ptr = static_cast<float*>(arr.ptr);
-            std::array<size_t,3> shape = {1, 1, 1};
-            for (auto i = 0;  i < arr.size; ++i)
-            {
-                if(ptr[i] > 0)
-                    shape[i] = static_cast<size_t>(ptr[i]);
-            }
-            return GPU::CreateImage<float>(shape); 
-        };
-
-    Image PushImage(pybind11::array_t<float, pybind11::array::c_style | pybind11::array::forcecast>& ndarray) 
-        { 
-            pybind11::buffer_info arr = ndarray.request();
-            if (arr.ndim > 3)
-            {
-                throw std::runtime_error("Number of dimensions must be three or less");
-            }
-            std::array<size_t,3> shape = {1, 1, 1};
-            for (auto i = 0;  i < arr.ndim; ++i)
-            {
-                if(arr.shape[i] > 0)
-                    shape[i] = static_cast<size_t>(arr.shape[i]);
-            }
-            float* arr_ptr = static_cast<float*>(arr.ptr);
-            std::vector<float> values(arr_ptr, arr_ptr + arr.size);
-            return GPU::PushImage<float>(values, shape); 
-        };
-
-    pybind11::array_t<float> PullImage(Image& image) 
-        { 
-            auto output = GPU::PullImage<float>(image);
-            auto result = pybind11::array_t<float>(output.size());
-            float* ptr = static_cast<float*>(result.request().ptr);
-            for (auto i = 0;  i < output.size(); ++i)
-            {
-                ptr[i] = output[i];
-            }
-            result.resize({image.Shape()[0], image.Shape()[1], image.Shape()[2]});
-            return result.squeeze();
-        }   
+Buffer PyGPU::CreateBuffer(ndarray_f& dimensions) 
+{ 
+    pybind11::buffer_info arr = dimensions.request();
+    if (arr.ndim > 1)
+    {
+        throw std::runtime_error("Expecting 1d shape array");
+    }
+    if (arr.size > 3)
+    {
+        throw std::runtime_error("Number of dimensions must be three or less");
+    }
+    float* ptr = static_cast<float*>(arr.ptr);
+    std::array<size_t,3> shape = {1, 1, 1};
+    for (auto i = 0;  i < arr.size; ++i)
+    {
+        if(ptr[i] > 0)
+        {
+            shape[i] = static_cast<size_t>(ptr[i]);
+        }
+    }
+    return GPU::CreateBuffer<float>(shape); 
 };
+
+Buffer PyGPU::PushBuffer(ndarray_f& ndarray) 
+{ 
+    pybind11::buffer_info arr = ndarray.request();
+    if (arr.ndim > 3)
+    {
+        throw std::runtime_error("Number of dimensions must be three or less");
+    }
+    std::array<size_t,3> shape = {1, 1, 1};
+    for (auto i = 0;  i < arr.ndim; ++i)
+    {
+        if(arr.shape[i] > 0)
+        {
+            shape[i] = static_cast<size_t>(arr.shape[i]);
+        }
+    }
+    float* arr_ptr = static_cast<float*>(arr.ptr);
+    std::vector<float> values(arr_ptr, arr_ptr + arr.size);
+    return GPU::PushBuffer<float>(values, shape); 
+};
+
+PyGPU::ndarray_f PyGPU::PullBuffer(Buffer& buffer) 
+{ 
+    auto output = GPU::PullBuffer<float>(buffer);
+    auto result = ndarray_f(output.size());
+    float* ptr = static_cast<float*>(result.request().ptr);
+    for (auto i = 0;  i < output.size(); ++i)
+    {
+        ptr[i] = output[i];
+    }
+    result.resize({buffer.Shape()[0], buffer.Shape()[1], buffer.Shape()[2]});
+    return result.squeeze();
+}    
+
+
+Image PyGPU::CreateImage(ndarray_f& dimensions) 
+{ 
+    pybind11::buffer_info arr = dimensions.request();
+    if (arr.ndim > 1)
+    {
+        throw std::runtime_error("Expecting 1d shape array");
+    }
+    if (arr.size > 3)
+    {
+        throw std::runtime_error("Number of dimensions must be three or less");
+    }
+    float* ptr = static_cast<float*>(arr.ptr);
+    std::array<size_t,3> shape = {1, 1, 1};
+    for (auto i = 0;  i < arr.size; ++i)
+    {
+        if(ptr[i] > 0)
+        {
+            shape[i] = static_cast<size_t>(ptr[i]);
+        }
+    }
+    return GPU::CreateImage<float>(shape); 
+};
+
+Image PyGPU::PushImage(ndarray_f& ndarray) 
+{ 
+    pybind11::buffer_info arr = ndarray.request();
+    if (arr.ndim > 3)
+    {
+        throw std::runtime_error("Number of dimensions must be three or less");
+    }
+    std::array<size_t,3> shape = {1, 1, 1};
+    for (auto i = 0;  i < arr.ndim; ++i)
+    {
+        if(arr.shape[i] > 0)
+        {
+            shape[i] = static_cast<size_t>(arr.shape[i]);
+        }
+    }
+    float* arr_ptr = static_cast<float*>(arr.ptr);
+    std::vector<float> values(arr_ptr, arr_ptr + arr.size);
+    return GPU::PushImage<float>(values, shape); 
+};
+
+PyGPU::ndarray_f PyGPU::PullImage(Image& image) 
+{ 
+    auto output = GPU::PullImage<float>(image);
+    auto result = ndarray_f(output.size());
+    float* ptr = static_cast<float*>(result.request().ptr);
+    for (auto i = 0;  i < output.size(); ++i)
+    {
+        ptr[i] = output[i];
+    }
+    result.resize({image.Shape()[0], image.Shape()[1], image.Shape()[2]});
+    return result.squeeze();
+} 
 
 
 

@@ -1,4 +1,7 @@
-from build.python import data, gpu, tier1
+from build.python import data, gpu
+from build.python.tier1 import *
+
+
 import numpy as np
 
 print("data wrapper testing: minimal interaction with data type buffer and image")
@@ -83,7 +86,7 @@ arr = np.ones([5,2,3]) * 100.0
 val = np.ones([5,2,3]) * 100.0 + 100
 input = dev2.push_buffer(arr)
 output = dev2.create_buffer(arr.shape)
-tier1.add_image_and_scalar(input, output, 100, dev2)
+add_image_and_scalar(input, output, 100, dev2)
 res = dev2.pull_buffer(output)
 print(res.shape, " vs ", val.shape)
 print(np.sum(res.flatten() - val.flatten()))
