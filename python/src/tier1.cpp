@@ -11,15 +11,10 @@
 
 using namespace cle;
 
-#include "gpu.cpp"
+#include "gpu.cpp"  // todo: find a cleaner way to call the class PyGPU
 
 void AddImageAndScalar(Buffer& input, Buffer& output, float scalar, PyGPU& gpu)
 {
-
-    pybind11::print(input.Info());
-
-    pybind11::print(output.Info());
-
     // auto raw_gpu = dynamic_cast<GPU&>(gpu);
     AddImageAndScalarKernel kernel(std::make_shared<GPU>(gpu));
     kernel.SetInput(input);

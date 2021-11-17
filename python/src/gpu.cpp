@@ -10,6 +10,9 @@
 using namespace cle;
 
 
+// todo: trampoline class for interface C++ python
+// Should we do that for all wrapped class? (aka overlayer of wrapper)
+
 class PyGPU : public GPU {
 public:
     /* Inherit the constructors */
@@ -124,48 +127,50 @@ public:
 
 
 
-PYBIND11_MODULE(gpu, m) {
+PYBIND11_MODULE(gpu, m) {  // define a module. module name = file name = cmake target name 
 
+    // class object definition
     pybind11::class_<PyGPU> object(m, "gpu");
-    object.def(pybind11::init<>(), "GPU default constructor");
-    object.def(pybind11::init<const char*, const char*>(), "GPU constructor", 
-        pybind11::arg("t_device_name"), pybind11::arg("t_device_type") = "all");
-    
-    object.def("select_device", &PyGPU::SelectDevice, "select GPU device", 
-        pybind11::arg("t_device_name"), pybind11::arg("t_device_type") = "all");
-    object.def("info", &PyGPU::Info, "return gpu informations");
-    object.def("name", &PyGPU::Name, "return gpu name");
-    object.def("score", &PyGPU::Score, "return gpu score");
-    object.def("wait_for_kernel_to_finish", &GPU::WaitForKernelToFinish, "Force GPU to wait until kernel finished");
+        // constructor
+        object.def(pybind11::init<>(), "GPU default constructor");
+        object.def(pybind11::init<const char*, const char*>(), "GPU constructor", 
+            pybind11::arg("t_device_name"), pybind11::arg("t_device_type") = "all");
+        // generic methods
+        object.def("select_device", &PyGPU::SelectDevice, "select GPU device", 
+            pybind11::arg("t_device_name"), pybind11::arg("t_device_type") = "all");
+        object.def("info", &PyGPU::Info, "return gpu informations");
+        object.def("name", &PyGPU::Name, "return gpu name");
+        object.def("score", &PyGPU::Score, "return gpu score");
+        object.def("wait_for_kernel_to_finish", &GPU::WaitForKernelToFinish, "Force GPU to wait until kernel finished");
+        // buffer methods
+        object.def("create_buffer", &PyGPU::CreateBuffer, "create a buffer object",
+            pybind11::arg("dimensions"));
+        object.def("push_buffer", &PyGPU::PushBuffer, "create and write a buffer object",
+            pybind11::arg("ndarray"));
+        object.def("pull_buffer", &PyGPU::PullBuffer, "read a buffer object",
+            pybind11::arg("buffer"));
+        // image methods
+        object.def("create_image", &PyGPU::CreateImage, "create an image object",
+            pybind11::arg("dimensions"));
+        object.def("push_image", &PyGPU::PushImage, "create and write an image object",
+            pybind11::arg("ndarray"));
+        object.def("pull_image", &PyGPU::PullImage, "read an image object",
+            pybind11::arg("image"));  
+        // help(gpu) cmd
+        object.doc() = R"pbdoc(
+            gpu class wrapper
+            -----------------------
+            shape()
+            ndim()
+            size()
 
-    object.def("create_buffer", &PyGPU::CreateBuffer, "create a buffer object",
-        pybind11::arg("dimensions"));
-    object.def("push_buffer", &PyGPU::PushBuffer, "create and write a buffer object",
-        pybind11::arg("ndarray"));
-    object.def("pull_buffer", &PyGPU::PullBuffer, "read a buffer object",
-        pybind11::arg("buffer"));
+            create_image()
+            push_image()
+            pull_image()
 
-    object.def("create_image", &PyGPU::CreateImage, "create an image object",
-        pybind11::arg("dimensions"));
-    object.def("push_image", &PyGPU::PushImage, "create and write an image object",
-        pybind11::arg("ndarray"));
-    object.def("pull_image", &PyGPU::PullImage, "read an image object",
-        pybind11::arg("image"));  
+            create_buffer()
+            push_buffer()
+            pull_buffer()
 
-    object.doc() = R"pbdoc(
-        gpu class wrapper
-        -----------------------
-        shape()
-        ndim()
-        size()
-
-        create_image()
-        push_image()
-        pull_image()
-
-        create_buffer()
-        push_buffer()
-        pull_buffer()
-
-    )pbdoc";
+        )pbdoc";
 }
