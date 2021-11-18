@@ -68,7 +68,7 @@ public:
     const cl::Program GetProgram(const size_t);
     void AddProgram(const cl::Program&, const size_t);
 
-    void WaitForKernelToFinish();
+    void WaitForKernelToFinish(bool);
     void Finish() const;
     void Flush() const;
 

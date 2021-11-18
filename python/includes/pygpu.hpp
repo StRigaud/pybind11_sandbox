@@ -26,9 +26,11 @@ public:
     using ndarray_uc = pybind11::array_t<unsigned char, pybind11::array::c_style | pybind11::array::forcecast>;
 
     Buffer CreateBuffer(ndarray_f&);
+    Buffer CreateCopyBuffer(Buffer&);
     Buffer PushBuffer(ndarray_f&);
     ndarray_f PullBuffer(Buffer&);
     Image CreateImage(ndarray_f&);
+    Image CreateCopyImage(Image&);
     Image PushImage(ndarray_f&);
     ndarray_f PullImage(Image&);
    

@@ -1,4 +1,4 @@
-#include "gpu.hpp"
+#include "pygpu.hpp"
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 
@@ -126,11 +126,13 @@ PyGPU::ndarray_f PyGPU::PullImage(Image& image)
 PYBIND11_MODULE(gpu, m) {  // define a module. module name = file name = cmake target name 
 
     // class object definition
-    pybind11::class_<PyGPU> object(m, "gpu");
+    pybind11::class_<PyGPU, std::shared_ptr<PyGPU>> object(m, "gpu");
+
         // constructor
-        object.def(pybind11::init<>(), "GPU default constructor");
-        object.def(pybind11::init<const char*, const char*>(), "GPU constructor", 
+        object.def(pybind11::init<>(), "GPU default constructor", pybind11::return_value_policy::move);
+        object.def(pybind11::init<const char*, const char*>(), "GPU constructor", pybind11::return_value_policy::move, 
             pybind11::arg("t_device_name"), pybind11::arg("t_device_type") = "all");
+
         // generic methods
         object.def("select_device", &PyGPU::SelectDevice, "select GPU device", 
             pybind11::arg("t_device_name"), pybind11::arg("t_device_type") = "all");
@@ -138,20 +140,23 @@ PYBIND11_MODULE(gpu, m) {  // define a module. module name = file name = cmake t
         object.def("name", &PyGPU::Name, "return gpu name");
         object.def("score", &PyGPU::Score, "return gpu score");
         object.def("wait_for_kernel_to_finish", &GPU::WaitForKernelToFinish, "Force GPU to wait until kernel finished");
+
         // buffer methods
-        object.def("create_buffer", &PyGPU::CreateBuffer, "create a buffer object",
+        object.def("create_buffer", &PyGPU::CreateBuffer, pybind11::return_value_policy::move, "create a buffer object",
             pybind11::arg("dimensions"));
-        object.def("push_buffer", &PyGPU::PushBuffer, "create and write a buffer object",
+        object.def("push_buffer", &PyGPU::PushBuffer, pybind11::return_value_policy::move, "create and write a buffer object",
             pybind11::arg("ndarray"));
-        object.def("pull_buffer", &PyGPU::PullBuffer, "read a buffer object",
+        object.def("pull_buffer", &PyGPU::PullBuffer, pybind11::return_value_policy::move, "read a buffer object",
             pybind11::arg("buffer"));
+
         // image methods
-        object.def("create_image", &PyGPU::CreateImage, "create an image object",
+        object.def("create_image", &PyGPU::CreateImage, pybind11::return_value_policy::move, "create an image object",
             pybind11::arg("dimensions"));
-        object.def("push_image", &PyGPU::PushImage, "create and write an image object",
+        object.def("push_image", &PyGPU::PushImage, pybind11::return_value_policy::move, "create and write an image object",
             pybind11::arg("ndarray"));
-        object.def("pull_image", &PyGPU::PullImage, "read an image object",
+        object.def("pull_image", &PyGPU::PullImage, pybind11::return_value_policy::move, "read an image object",
             pybind11::arg("image"));  
+
         // help(gpu) cmd
         object.doc() = R"pbdoc(
             gpu class wrapper
